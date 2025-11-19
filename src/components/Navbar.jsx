@@ -4,10 +4,18 @@ import { Menu, X, Sparkles } from 'lucide-react'
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', onScroll)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 10)
+      const h = document.documentElement
+      const p = ((h.scrollTop) / (h.scrollHeight - h.clientHeight)) * 100
+      setProgress(p)
+      document.documentElement.style.setProperty('--scroll', `${p}%`)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -19,7 +27,8 @@ export default function Navbar() {
 
   return (
     <header className={`fixed inset-x-0 top-0 z-40 transition ${scrolled ? 'backdrop-blur-xl bg-black/40 border-b border-white/10' : 'bg-transparent'}`}>
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <div className="progress-bar" aria-hidden />
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <a href="#" className="group inline-flex items-center gap-2">
           <div className="relative">
             <span className="absolute -inset-2 rounded-full bg-red-500/20 blur-xl" />
@@ -29,16 +38,16 @@ export default function Navbar() {
           <span className="hidden text-white/60 sm:inline">Autonpesu</span>
         </a>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 md:flex">
           {link('#services', 'Palvelut')}
           {link('#pricing', 'Hinnasto')}
           {link('#gallery', 'Galleria')}
           {link('#contact', 'Yhteys')}
-          <a href="#contact" className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 hover:bg-white/90 transition">Varaa aika</a>
+          <a href="#contact" className="magnet rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 hover:bg-white/90 transition"><span>Varaa aika</span></a>
         </div>
 
-        <button onClick={() => setOpen(!open)} className="md:hidden text-white/90">
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        <button onClick={() => setOpen(!open)} className="md:hidden text-white/90" aria-label="Toggle menu">
+          {open ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
         </button>
       </nav>
       {open && (
